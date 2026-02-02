@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier , VotingClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from xgboost import XGBClassifier
 import lightgbm as lgb
 from sklearn.metrics import (
@@ -16,7 +16,6 @@ from sklearn.metrics import (
     accuracy_score,
     f1_score
 )
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib  # for saving models
@@ -25,8 +24,8 @@ import joblib  # for saving models
 # SETTINGS – adjust if needed
 # ────────────────────────────────────────────────
 INPUT_FILE = "dataset/balanced_dataset_smote_selective.csv"  # from balancing.py
-TARGET_COL = "Label_encoded"                         # your target
-TEST_SIZE  = 0.30                                    #split
+TARGET_COL = "Label_encoded"  # your target
+TEST_SIZE = 0.30  # split
 RANDOM_STATE = 42
 
 # Label mapping for readable reports (copy from earlier)
@@ -71,7 +70,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=RANDOM_STATE,
     stratify=y  # important!
 )
-
 print(f"\nTrain shape: {X_train.shape} | Test shape: {X_test.shape}")
 
 # ────────────────────────────────────────────────
@@ -82,10 +80,10 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # ────────────────────────────────────────────────
-# Function to train, predict, evaluate, and plot CM
+# Enhanced evaluation function (now includes full test metrics & CM)
 # ────────────────────────────────────────────────
 def evaluate_model(model, model_name, use_scaled=True):
-    print(f"\n=== Training {model_name} ===")
+    print(f"\n=== Training & Evaluating {model_name} ===")
     
     X_tr = X_train_scaled if use_scaled else X_train
     X_te = X_test_scaled if use_scaled else X_test
@@ -111,7 +109,7 @@ def evaluate_model(model, model_name, use_scaled=True):
     # Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(12, 10))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                 xticklabels=target_names, yticklabels=target_names)
     plt.title(f"Confusion Matrix - {model_name}")
     plt.ylabel('True Label')
@@ -120,17 +118,20 @@ def evaluate_model(model, model_name, use_scaled=True):
     plt.yticks(rotation=0)
     plt.tight_layout()
     plt.savefig(f"cm_{model_name.lower().replace(' ', '_')}.png")
+    plt.close()  # close figure to free memory
     print(f"Saved CM plot → cm_{model_name.lower().replace(' ', '_')}.png")
     
-    # Save model (optional)
+    # Save model
     joblib.dump(model, f"{model_name.lower().replace(' ', '_')}_model.pkl")
     print(f"Saved model → {model_name.lower().replace(' ', '_')}_model.pkl")
     
     return model, y_pred
 
 # ────────────────────────────────────────────────
-# Models
+# Models (uncomment the ones you want)
 # ────────────────────────────────────────────────
+
+# Random Forest (commented out as in your code)
 '''
 rf_clf = RandomForestClassifier(
     n_estimators=100,
@@ -141,6 +142,8 @@ rf_clf = RandomForestClassifier(
 )
 evaluate_model(rf_clf, "Random Forest")
 '''
+
+# XGBoost
 xgb_clf = XGBClassifier(
     n_estimators=300,
     max_depth=8,
@@ -148,8 +151,9 @@ xgb_clf = XGBClassifier(
     random_state=42,
     n_jobs=-1
 )
-evaluate_model(xgb_clf,"XGBoost")
+evaluate_model(xgb_clf, "XGBoost")
 
+# LightGBM (commented out as in your code)
 '''
 lgb_clf = lgb.LGBMClassifier(
     n_estimators=400,
@@ -159,7 +163,20 @@ lgb_clf = lgb.LGBMClassifier(
     class_weight='balanced',
     verbosity=-1
 )
-
-evaluate_model(lgb_clf,"LightGBM")
+evaluate_model(lgb_clf, "LightGBM")
 '''
+
+# Voting Ensemble (optional - uncomment if you want)
+'''
+voting_clf = VotingClassifier(
+    estimators=[
+        ('rf', RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE, n_jobs=-1, class_weight='balanced')),
+        ('xgb', XGBClassifier(n_estimators=300, random_state=42, n_jobs=-1)),
+        ('lgb', lgb.LGBMClassifier(n_estimators=400, random_state=42, class_weight='balanced', verbosity=-1))
+    ],
+    voting='soft'
+)
+evaluate_model(voting_clf, "Voting Ensemble")
+'''
+
 print("\nAll models trained and evaluated!")

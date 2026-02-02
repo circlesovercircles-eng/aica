@@ -1,0 +1,31 @@
+FINAL TEST RESULTS - UNSEEN TEST SET
+Model:          xgboost_model.pkl
+Data file:      dataset/preprocessed_traffic.csv
+Test size:      848,363 rows (30%)
+Accuracy:       0.7883
+Balanced Acc:   0.0654
+F1-macro:       0.0588
+F1-weighted:    0.7081
+
+Classification Report:
+                            precision    recall  f1-score   support
+
+                    BENIGN     0.8002    0.9814    0.8816    681396
+                       Bot     0.0000    0.0000    0.0000       587
+                      DDoS     0.0000    0.0000    0.0000     38408
+             DoS GoldenEye     0.0000    0.0000    0.0000      3088
+                  DoS Hulk     0.0000    0.0000    0.0000     69037
+          DoS Slowhttptest     0.0000    0.0000    0.0000      1650
+             DoS slowloris     0.0000    0.0000    0.0000      1739
+               FTP-Patator     0.0000    0.0000    0.0000      2380
+                Heartbleed     0.0000    0.0000    0.0000         3
+              Infiltration     0.0000    0.0000    0.0000        11
+                  PortScan     0.0000    0.0000    0.0000     47641
+               SSH-Patator     0.0000    0.0000    0.0000      1769
+  Web Attack - Brute Force     0.0000    0.0000    0.0000       452
+Web Attack - Sql Injection     0.0000    0.0000    0.0000         6
+          Web Attack - XSS     0.0000    0.0000    0.0000       196
+
+                  accuracy                         0.7883    848363
+                 macro avg     0.0533    0.0654    0.0588    848363
+              weighted avg     0.6427    0.7883    0.7081    848363
